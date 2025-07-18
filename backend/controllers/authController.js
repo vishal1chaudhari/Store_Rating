@@ -23,11 +23,11 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    console.log("🔍 Checking user...");
+    console.log("Checking user...");
     
     const [results] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
 
-    console.log("✅ DB result:", results);
+    console.log("DB result:", results);
 
     const user = results[0];
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    console.log("✅ Login success, sending token");
+    console.log("Login success, sending token");
 
     res.json({
       token,
@@ -49,7 +49,7 @@ exports.login = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Error during login:", err);
+    console.error("Error during login:", err);
     res.status(500).json({ message: err.message });
   }
 };

@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
-const Signup = () => {
+const UpdatePassword = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    address: '',
-    password: '',
+    currentPassword: '',
+    newPassword: '',
     confirmPassword: ''
   });
   const [errors, setErrors] = useState({});
@@ -18,41 +16,25 @@ const Signup = () => {
     const newErrors = {};
 
     
-    if (!formData.name) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.length < 20 || formData.name.length > 60) {
-      newErrors.name = 'Name must be between 20 and 60 characters';
+    if (!formData.currentPassword) {
+      newErrors.currentPassword = 'Current password is required';
     }
 
-    
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    
-    if (!formData.address) {
-      newErrors.address = 'Address is required';
-    } else if (formData.address.length > 400) {
-      newErrors.address = 'Address must be 400 characters or less';
-    }
-
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8 || formData.password.length > 16) {
-      newErrors.password = 'Password must be 8-16 characters long';
-    } else if (!/[A-Z]/.test(formData.password)) {
-      newErrors.password = 'Password must include at least one uppercase letter';
-    } else if (!/[^A-Za-z0-9]/.test(formData.password)) {
-      newErrors.password = 'Password must include at least one special character';
+   
+    if (!formData.newPassword) {
+      newErrors.newPassword = 'New password is required';
+    } else if (formData.newPassword.length < 8 || formData.newPassword.length > 16) {
+      newErrors.newPassword = 'Password must be 8-16 characters long';
+    } else if (!/[A-Z]/.test(formData.newPassword)) {
+      newErrors.newPassword = 'Password must include at least one uppercase letter';
+    } else if (!/[^A-Za-z0-9]/.test(formData.newPassword)) {
+      newErrors.newPassword = 'Password must include at least one special character';
     }
 
     
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your new password';
+    } else if (formData.newPassword !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -83,99 +65,73 @@ const Signup = () => {
     }
 
     try {
-      await axios.post('/auth/register', {
-        name: formData.name,
-        email: formData.email,
-        address: formData.address,
-        password: formData.password
+      await axios.post('/users/update-password', {
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
       });
 
-      setSuccess('Registration successful! Redirecting to login...');
+      setSuccess('Password updated successfully!');
       setFormData({
-        name: '',
-        email: '',
-        address: '',
-        password: '',
+        currentPassword: '',
+        newPassword: '',
         confirmPassword: ''
       });
       
       
+      const userRole = localStorage.getItem('role');
+      let redirectPath = '/login';
+      
+      if (userRole === 'admin') {
+        redirectPath = '/admin';
+      } else if (userRole === 'user') {
+        redirectPath = '/user';
+      } else if (userRole === 'store_owner') {
+        redirectPath = '/owner';
+      }
+      
+      
       setTimeout(() => {
-        navigate('/login');
+        navigate(redirectPath);
       }, 2000);
     } catch (error) {
-      console.error('Registration error:', error);
-      const errorMessage = error.response?.data?.message || 'Registration failed';
+      console.error('Update password error:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to update password';
       setErrors({ submit: errorMessage });
     }
   };
 
   return (
     <div className="container">
-      <h1 className="heading">Sign Up</h1>
+      <h1 className="heading">Update Password</h1>
       
       <form onSubmit={handleSubmit} className="form">
         <div className="form-group">
-          <label htmlFor="name">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className={errors.name ? 'error' : ''}
-            placeholder="Enter your full name (20-60 characters)"
-          />
-          {errors.name && (
-            <span className="error-message">{errors.name}</span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={errors.email ? 'error' : ''}
-            placeholder="Enter your email address"
-          />
-          {errors.email && (
-            <span className="error-message">{errors.email}</span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="address">Address</label>
-          <textarea
-            id="address"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            className={errors.address ? 'error' : ''}
-            placeholder="Enter your address (max 400 characters)"
-            rows="3"
-          />
-          {errors.address && (
-            <span className="error-message">{errors.address}</span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="currentPassword">Current Password</label>
           <input
             type="password"
-            id="password"
-            name="password"
-            value={formData.password}
+            id="currentPassword"
+            name="currentPassword"
+            value={formData.currentPassword}
             onChange={handleChange}
-            className={errors.password ? 'error' : ''}
-            placeholder="Enter password (8-16 characters)"
+            className={errors.currentPassword ? 'error' : ''}
           />
-          {errors.password && (
-            <span className="error-message">{errors.password}</span>
+          {errors.currentPassword && (
+            <span className="error-message">{errors.currentPassword}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="newPassword">New Password</label>
+          <input
+            type="password"
+            id="newPassword"
+            name="newPassword"
+            value={formData.newPassword}
+            onChange={handleChange}
+            className={errors.newPassword ? 'error' : ''}
+          />
+          {errors.newPassword && (
+            <span className="error-message">{errors.newPassword}</span>
           )}
           <small className="help-text">
             Password must be 8-16 characters, include at least one uppercase letter and one special character.
@@ -183,7 +139,7 @@ const Signup = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
+          <label htmlFor="confirmPassword">Confirm New Password</label>
           <input
             type="password"
             id="confirmPassword"
@@ -191,7 +147,6 @@ const Signup = () => {
             value={formData.confirmPassword}
             onChange={handleChange}
             className={errors.confirmPassword ? 'error' : ''}
-            placeholder="Confirm your password"
           />
           {errors.confirmPassword && (
             <span className="error-message">{errors.confirmPassword}</span>
@@ -208,14 +163,27 @@ const Signup = () => {
 
         <div className="button-group">
           <button type="submit" className="submit-button">
-            Sign Up
+            Update Password
           </button>
           <button 
             type="button" 
-            onClick={() => navigate('/login')}
+            onClick={() => {
+              const userRole = localStorage.getItem('role');
+              let redirectPath = '/login';
+              
+              if (userRole === 'admin') {
+                redirectPath = '/admin';
+              } else if (userRole === 'user') {
+                redirectPath = '/user';
+              } else if (userRole === 'store_owner') {
+                redirectPath = '/owner';
+              }
+              
+              navigate(redirectPath);
+            }}
             className="cancel-button"
           >
-            Back to Login
+            Cancel
           </button>
         </div>
       </form>
@@ -248,16 +216,15 @@ const Signup = () => {
           font-weight: bold;
           color: #333;
         }
-        .form-group input, .form-group textarea {
+        .form-group input {
           width: 100%;
           padding: 10px;
           border: 1px solid #ddd;
           border-radius: 4px;
           font-size: 16px;
           box-sizing: border-box;
-          font-family: inherit;
         }
-        .form-group input.error, .form-group textarea.error {
+        .form-group input.error {
           border-color: #dc3545;
         }
         .error-message {
@@ -321,4 +288,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default UpdatePassword; 

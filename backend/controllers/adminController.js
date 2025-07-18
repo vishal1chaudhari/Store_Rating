@@ -7,7 +7,7 @@ exports.getAdminDashboard = (req, res) => {
     total_ratings: 0,
   };
 
-  // Query to get total users
+  
   const userQuery = `SELECT COUNT(*) AS count FROM users`;
   const storeQuery = `SELECT COUNT(*) AS count FROM stores`;
   const ratingQuery = `SELECT COUNT(*) AS count FROM ratings`;
@@ -36,7 +36,7 @@ exports.getAdminDashboard = (req, res) => {
 exports.getStats = async (req, res) => {
   try {
     const [userRows] = await db.query(`SELECT COUNT(*) AS count FROM users`);
-    const [storeRows] = await db.query(`SELECT COUNT(*) AS count FROM users WHERE role = 'store_owner'`);
+    const [storeRows] = await db.query(`SELECT COUNT(*) AS count FROM stores`);
     const [ratingRows] = await db.query(`SELECT COUNT(*) AS count FROM ratings`);
 
     res.json({
@@ -45,7 +45,7 @@ exports.getStats = async (req, res) => {
       ratings: ratingRows[0].count
     });
   } catch (err) {
-    console.error('Error fetching stats:', err); // 👈 Add this
+    console.error('Error fetching stats:', err);
     res.status(500).json({ message: 'Error fetching stats' });
   }
 };
@@ -62,7 +62,14 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getAllStores = async (req, res) => {
   try {
-    const [stores] = await db.query('SELECT * FROM stores');
+    const [stores] = await db.query(`
+      SELECT s.id, s.name, s.email, s.address, 
+             COALESCE(ROUND(AVG(r.rating), 1), 0) AS avgRating
+      FROM stores s
+      LEFT JOIN ratings r ON s.id = r.store_id
+      GROUP BY s.id, s.name, s.email, s.address
+      ORDER BY s.name ASC
+    `);
     res.json(stores);
   } catch (err) {
     console.error('Error fetching stores:', err);
@@ -70,7 +77,4 @@ exports.getAllStores = async (req, res) => {
   }
 };
 
-// module.exports = {
-//   getAdminDashboard,
-//   getStats
-// };
+

@@ -6,8 +6,6 @@ const {
 } = require('../controllers/ratingController');
 
 const { verifyToken, checkRole } = require('../middleware/authMiddleware');
-
-// ✅ Protected routes for normal users
 router.post('/submit', verifyToken, checkRole('user'), submitOrUpdateRating);
 router.get('/', verifyToken, checkRole('user'), getUserRatingsForStores);
 

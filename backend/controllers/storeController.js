@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// ➕ Add Store
+
 exports.addStore = (req, res) => {
   const { name, email, address, owner_id } = req.body;
 
@@ -16,7 +16,6 @@ exports.addStore = (req, res) => {
   });
 };
 
-// 📋 Get All Stores (with filters + avg rating)
 exports.getStores = (req, res) => {
   const { name, email, address } = req.query;
 

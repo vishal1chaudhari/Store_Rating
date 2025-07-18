@@ -62,13 +62,22 @@ const Login = () => {
         <button type="submit" style={styles.button}>Login</button>
       </form>
       {error && <p style={styles.error}>{error}</p>}
+      
+      <div style={styles.signupLink}>
+        <p>Don't have an account? <button 
+          onClick={() => navigate('/signup')} 
+          style={styles.linkButton}
+        >
+          Sign up here
+        </button></p>
+      </div>
     </div>
   );
 };
 
 export default Login;
 
-// Simple inline styles
+
 const styles = {
   container: {
     maxWidth: '400px',
@@ -93,5 +102,18 @@ const styles = {
     border: 'none',
     borderRadius: '5px'
   },
-  error: { color: 'red', marginTop: '10px' }
+  error: { color: 'red', marginTop: '10px' },
+  signupLink: {
+    marginTop: '20px',
+    fontSize: '14px',
+  },
+  linkButton: {
+    background: 'none',
+    border: 'none',
+    color: '#007bff',
+    textDecoration: 'underline',
+    cursor: 'pointer',
+    padding: '0',
+    fontSize: 'inherit',
+  }
 };
